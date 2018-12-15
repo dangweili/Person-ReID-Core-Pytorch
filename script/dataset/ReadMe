@@ -1,0 +1,23 @@
+for image-based person re-identification, as follows:
+single-shot, only using identity
+mutiple-shot, only using identity
+single-query, fixed query + test identity, default
+mutiple-query, fixed expansion query + test identity
+
+# for single-shot, as follow:
+1: generate query with generate gallery using test identities
+
+# for mutiple-shot, as follow:
+1: generate query expansion
+
+# for single-query, as follows:
+1: fixed query with fixed gallery, for market1501 dataset
+2: generate query with generate gallery, for cuhk03 dataset
+
+# for mutiple-query, as follows:
+1: fixed query expansion with fixed gallery
+2: generate query expansion with generated gallery
+
+for sequence-based person re-identification, as follows:
+step 1: generate the sequence-based representation for each sequence 
+step 2: using the same principle as image-based person re-identification

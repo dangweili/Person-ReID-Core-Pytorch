@@ -86,7 +86,7 @@ class PCBExtractFeature(object):
 
         # imgs should be Variable
         if not isinstance(imgs, Variable):
-            print 'imgs should be type: Variable'
+            print('imgs should be type: Variable')
             raise ValueError
         local_feat_list, local_logits_list =  self.model(imgs)
         # may normalize for speed

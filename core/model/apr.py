@@ -35,7 +35,7 @@ class APR(nn.Module):
             fc = nn.Linear(2048, cnt)
             init.normal(fc.weight, std=0.001)
             self.fc_group.append(fc)
-        print len(self.fc_group)
+        print(len(self.fc_group))
         
     def forward(self, x):
         """
@@ -74,7 +74,7 @@ class APRExtractFeature(object):
 
         # imgs should be Variable
         if not isinstance(imgs, Variable):
-            print 'imgs should be type: Variable'
+            print('imgs should be type: Variable')
             raise ValueError
         feat =  self.model(imgs)
         # no-local-normalize

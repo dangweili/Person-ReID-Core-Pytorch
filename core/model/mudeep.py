@@ -230,7 +230,7 @@ class MuDeepExtractFeature(object):
 
         # imgs should be Variable
         if not isinstance(imgs, Variable):
-            print 'imgs should be type: Variable'
+            print('imgs should be type: Variable')
             raise ValueError
         local_feat = self.model(imgs)
         feat = local_feat.data.cpu().numpy()

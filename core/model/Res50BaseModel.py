@@ -44,7 +44,7 @@ class Res50ExtractFeature(object):
 
         # imgs should be Variable
         if not isinstance(imgs, Variable):
-            print 'imgs should be type: Variable'
+            print('imgs should be type: Variable')
             raise ValueError
         # feat, logits =  self.model(imgs)
         feat =  self.model(imgs)

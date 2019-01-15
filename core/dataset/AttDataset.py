@@ -2,7 +2,7 @@ import torch.utils.data as data
 import os
 from PIL import Image
 import numpy as np
-import cPickle as pickle
+import pickle
 import copy
 
 class ReIDDataset(data.Dataset):
@@ -28,11 +28,11 @@ class ReIDDataset(data.Dataset):
         else:
             raise ValueError
         if not self.partition.has_key(split):
-            print split + 'does not exist in dataset.'
+            print(split + 'does not exist in dataset.')
             raise ValueError
         
         if partition_idx > len(self.partition[split])-1:
-            print 'partition_idx is out of range in partition.'
+            print('partition_idx is out of range in partition.')
             raise ValueError
         else:
             self.train_ids = self.partition[split][partition_idx]
@@ -131,11 +131,11 @@ class ReIDTestDataset(data.Dataset):
         else:
             raise ValueError
         if not self.partition.has_key(split):
-            print split + 'does not exist in dataset.'
+            print(split + 'does not exist in dataset.')
             raise ValueError
         
         if partition_idx > len(self.partition[split])-1:
-            print 'partition_idx is out of range in partition.'
+            print('partition_idx is out of range in partition.')
             raise ValueError
         else:
             self.test_ids = self.partition[split][partition_idx]

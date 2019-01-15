@@ -20,7 +20,7 @@ class RandomIdentitySampler(Sampler):
         self.dataset = dataset
         self.num_instances = num_instances
         if num_instances == 1:
-            print 'The num_instances in RandomIdentitySampler should be larger than 1.'
+            print('The num_instances in RandomIdentitySampler should be larger than 1.')
             raise ValueError
         self.create_dataset()
 
@@ -72,7 +72,7 @@ class RandomIdentitySamplerXC(Sampler):
         self.dataset = dataset
         self.num_instances = num_instances
         if num_instances == 1:
-            print 'The num_instances in RandomIdentitySamplerXC should be larger than 1.'
+            print('The num_instances in RandomIdentitySamplerXC should be larger than 1.')
             raise ValueError
         self.create_dataset()
 

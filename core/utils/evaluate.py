@@ -80,8 +80,8 @@ def compute_dist(array1, array2, dist_type='euclidean_normL2', A=None, verbose=F
         D = array1.shape[1]
         M1 = array1.shape[0]
         M2  = array2.shape[0]
-        print 'compute %s distance between matrix [%d, %d] and [%d, %d]' \
-            %(dist_type, M1, D, M2, D)
+        print('compute %s distance between matrix [%d, %d] and [%d, %d]' \
+            %(dist_type, M1, D, M2, D))
     # for cosine similarity
     if dist_type == 'cosine':
         # we use negative cosine similarity as distance
@@ -143,7 +143,7 @@ def feature_pooling(feat, **kwargs):
     elif operation == 'max':
         return np.max(feat, axis=0, keepdims=True)
     else:
-        print 'The pooling operation should be in %s'%('average, max')
+        print('The pooling operation should be in %s'%('average, max'))
         raise ValueError
 
 def compute_score(dist_mat, query_pid, query_cam, gallery_pid, gallery_cam, seperate_cam=False):
@@ -237,7 +237,7 @@ def evaluate_image_ss(dist_mat, pid, cam, **kwargs):
             data[p][c] = []
         data[p][c].append(i)
     # random T times for testing
-    print 'compute score for single shot.'
+    print('compute score for single shot.')
     for t in range(T):
         # sample query idx
         index = []
@@ -292,7 +292,7 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
         query_pid = gallery_pid[:, query_idx]
         query_cam = gallery_cam[:, query_idx]
         query_feat = feat[query_idx, :]
-        print 'compute distance for single query.'
+        print('compute distance for single query.')
         if kwargs.has_key('dist_type'):
             dist_mat = compute_dist(query_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
@@ -323,12 +323,12 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
         gallery_pid = np.array(pid).reshape((1, len(pid)))
         gallery_cam = np.array(cam).reshape((1, len(cam)))
         gallery_feat = feat
-        print 'compute distance for mutiple query.'
+        print('compute distance for mutiple query.')
         if kwargs.has_key('dist_type'):
             dist_mat = compute_dist(query_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
             dist_mat = compute_dist(query_feat, gallery_feat, dist_type='euclidean_normL2', verbose=True)
-        print 'compute score for mutiple query.'
+        print('compute score for mutiple query.')
         mAP, CMC = compute_score(dist_mat, query_pid, query_cam, gallery_pid, gallery_cam)
         result['mq'] = dict()
         result['mq']['mAP'] = mAP
@@ -336,7 +336,7 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
             
     # single shot, specially for cuhk03 val/test in old style
     if kwargs.has_key('eval_type') and 'ss' in kwargs['eval_type']:
-        print 'compute distance for single shot.'
+        print('compute distance for single shot.')
         if kwargs.has_key('dist_type'):
             dist_mat = compute_dist(feat, feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
@@ -366,12 +366,12 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
             query_feat[i,:] = feature_pooling(feat[query_idx[i], :], **kwargs)
         query_pid = np.array(query_pid).reshape((1, Q))
         query_cam = np.array(query_cam).reshape((1, Q))
-        print 'compute distance for mutiple shot.'
+        print('compute distance for mutiple shot.')
         if kwargs.has_key('dist_type'):
             dist_mat = compute_dist(query_feat, query_feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
             dist_mat = compute_dist(query_feat, query_feat, dist_type='euclidean_normL2', verbose=True)
-        print 'compute score for mutiple shot.'
+        print('compute score for mutiple shot.')
         mAP, CMC = evaluate_image_ss(dist_mat, query_pid, query_cam, repated_times=1)
         result['ms'] = dict()
         result['ms']['mAP'] = mAP
@@ -396,12 +396,12 @@ def reid_evaluate_image_fixed_query_gallery(feat_func, dataset, **kwargs):
         if using mutiple query, using fixed groundtruth or gallery
     """
     
-    print 'Extracting features for fixed query.'
+    print('Extracting features for fixed query.')
     dataset.create_image_list_by_fixed_query()
     query_feat, query_pid, query_cam, query_seq, query_frame, query_record = \
         extract_feat(feat_func, dataset)
 
-    print 'Extracting features for fixed gallery.'
+    print('Extracting features for fixed gallery.')
     dataset.create_image_list_by_fixed_gallery()
     gallery_feat, gallery_pid, gallery_cam, gallery_seq, gallery_frame, gallery_record = \
         extract_feat(feat_func, dataset)
@@ -409,7 +409,7 @@ def reid_evaluate_image_fixed_query_gallery(feat_func, dataset, **kwargs):
     # mutiple query
     if kwargs.has_key('eval_type') and 'mq' in kwargs['eval_type']:
         if dataset.dataset.has_key('image_gt'):
-            print 'Extracting features for fixed groundtruth in mutiple query.'
+            print('Extracting features for fixed groundtruth in mutiple query.')
             dataset.create_image_list_by_fixed_groundtruth()
             gt_feat, gt_pid, gt_cam, gt_seq, gt_frame, gt_record = \
                 extract_feat(feat_func, dataset)
@@ -445,13 +445,13 @@ def reid_evaluate_image_sequence_fixed_query_gallery_groundtruth(query_feat, que
     gallery_pid = np.array(gallery_pid).reshape((1, G))
     gallery_cam = np.array(gallery_cam).reshape((1, G))
 
-    print 'compute distance for single query.'
+    print('compute distance for single query.')
     if kwargs.has_key('dist_type'):
         dist_mat = compute_dist(query_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
     else:
         dist_mat = compute_dist(query_feat, gallery_feat, dist_type='euclidean_normL2', verbose=True)
     
-    print 'compute score for single query.'
+    print('compute score for single query.')
     mAP, CMC = compute_score(dist_mat, query_pid, query_cam, gallery_pid, gallery_cam)
     result['sq'] = dict()
     result['sq']['mAP'] = mAP
@@ -474,7 +474,7 @@ def reid_evaluate_image_sequence_fixed_query_gallery_groundtruth(query_feat, que
 
     if kwargs.has_key('rerank') and kwargs['rerank']:
         q_g_dist = dist_mat
-        print 'compute distance for single query rerank.'
+        print('compute distance for single query rerank.')
         if kwargs.has_key('dist_type'):
             q_q_dist = compute_dist(query_feat, query_feat, dist_type=kwargs['dist_type'], verbose=True)
             g_g_dist = compute_dist(gallery_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
@@ -482,7 +482,7 @@ def reid_evaluate_image_sequence_fixed_query_gallery_groundtruth(query_feat, que
             q_q_dist = compute_dist(query_feat, query_feat, dist_type='euclidean_normL2', verbose=True)
             g_g_dist = compute_dist(gallery_feat, gallery_feat, dist_type='euclidean_normL2', verbose=True)
         rerank_sq_dist = re_ranking(q_g_dist, q_q_dist, g_g_dist, k1, k2, lambda_value)
-        print 'compute score for single query rerank.'
+        print('compute score for single query rerank.')
         mAP, CMC = compute_score(rerank_sq_dist, query_pid, query_cam, gallery_pid, gallery_cam)
         result['sq_rerank'] = dict()
         result['sq_rerank']['mAP'] = mAP
@@ -500,12 +500,12 @@ def reid_evaluate_image_sequence_fixed_query_gallery_groundtruth(query_feat, que
         idx = ((p == gt_pid).astype(float) + (c == gt_cam).astype(float)) == 2
         mquery_feat[i, :] = feature_pooling(gt_feat[idx[0, :], :], **kwargs)
     
-    print 'compute distance for mutiple query.'
+    print('compute distance for mutiple query.')
     if kwargs.has_key('dist_type'):
         dist_mat = compute_dist(mquery_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
     else:
         dist_mat = compute_dist(mquery_feat, gallery_feat, dist_type='euclidean_normL2', verbose=True)
-    print 'compute score for mutiple query.'
+    print('compute score for mutiple query.')
     mAP, CMC = compute_score(dist_mat, query_pid, query_cam, gallery_pid, gallery_cam)
     result['mq'] = dict()
     result['mq']['mAP'] = mAP
@@ -514,13 +514,13 @@ def reid_evaluate_image_sequence_fixed_query_gallery_groundtruth(query_feat, que
     # rerank sq
     if kwargs.has_key('rerank') and kwargs['rerank']:
         mq_g_dist = dist_mat
-        print 'compute distance for mutiple query rerank.'
+        print('compute distance for mutiple query rerank.')
         if kwargs.has_key('dist_type'):
             mq_mq_dist = compute_dist(mquery_feat, mquery_feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
             mq_mq_dist = compute_dist(mquery_feat, mquery_feat, dist_type='euclidean_normL2', verbose=True)
         rerank_mq_dist = re_ranking(mq_g_dist, mq_mq_dist, g_g_dist, k1, k2, lambda_value)
-        print 'compute score for mutiple query rerank.'
+        print('compute score for mutiple query rerank.')
         mAP, CMC = compute_score(rerank_mq_dist, query_pid, query_cam, gallery_pid, gallery_cam)
         result['mq_rerank'] = dict()
         result['mq_rerank']['mAP'] = mAP
@@ -689,7 +689,7 @@ def reid_evaluate_image(feat_func, dataset, **kwargs):
     if dataset.dataset['description'] == "rap2":
         return reid_evaluate_image_rap2(feat_func, dataset, **kwargs)
 
-    print 'The dataset: {} does not support evaluatation.'%(dataset.dataset['description'])
+    print('The dataset: {} does not support evaluatation.'%(dataset.dataset['description']))
     raise ValueError
     
 def reid_evaluate_sequence(feat_func, dataset, **kwargs):
@@ -700,7 +700,7 @@ def reid_evaluate_sequence(feat_func, dataset, **kwargs):
     if dataset.dataset['description'] == 'mars':
         return reid_evaluate_sequence_mars(feat_func, dataset, **kwargs)
     
-    print 'The dataset: {} does not support evaluatation.'%(dataset.dataset['description'])
+    print('The dataset: {} does not support evaluatation.'%(dataset.dataset['description']))
     raise ValueError
 
 # copy from houjing huang

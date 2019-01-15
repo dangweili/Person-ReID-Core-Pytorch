@@ -10,7 +10,7 @@ import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 from torch.nn.parallel import DataParallel
-import cPickle as pickle
+import pickle
 import time
 import argparse
 
@@ -117,7 +117,7 @@ class Config(object):
             partitions['cuhk03_labeled'] = './dataset/cuhk03/cuhk03_partition_old.pkl'
         self.dataset_name = args.dataset
         if not datasets.has_key(args.dataset) or not partitions.has_key(args.dataset):
-            print "Please select the right dataset name."
+            print("Please select the right dataset name.")
             raise ValueError
         else:
             self.dataset = datasets[args.dataset]
@@ -151,7 +151,7 @@ class Config(object):
         self.ckpt_file = args.ckpt_file
         if self.resume:
             if self.ckpt_file == '':
-                print 'Please input the ckpt_file if you want to resume training'
+                print('Please input the ckpt_file if you want to resume training')
                 raise ValueError
         self.model_weight_file = args.model_weight_file
         self.test_only = args.test_only
@@ -283,13 +283,13 @@ feat_func = MuDeepExtractFeature(model_w)
 # test only
 if cfg.test_only:
     result = reid_evaluate(feat_func, test_set, **cfg.test_kwargs)
-    print '-' * 60
-    print 'Evaluation on %s set:' % (cfg.test_split)
+    print('-' * 60)
+    print('Evaluation on %s set:' % (cfg.test_split))
     for evaluation in result.keys():
-        print '%s:' % (evaluation)
-        print "mAP: %.4f, Rank1: %.4f, Rank5: %.4f, Rank10: %.4f" % (result[evaluation]['mAP'], result[evaluation]['CMC'][0, 0],\
-                result[evaluation]['CMC'][0, 4], result[evaluation]['CMC'][0, 9])
-    print '-' * 60
+        print('%s:' % (evaluation))
+        print("mAP: %.4f, Rank1: %.4f, Rank5: %.4f, Rank10: %.4f" % (result[evaluation]['mAP'], result[evaluation]['CMC'][0, 0],\
+                result[evaluation]['CMC'][0, 4], result[evaluation]['CMC'][0, 9]))
+    print('-' * 60)
     sys.exit(0)
      
 # training
@@ -356,13 +356,13 @@ for epoch in range(start_epoch, cfg.total_epochs):
     ##########################
     if (epoch + 1) % cfg.epochs_per_val == 0:
         result = reid_evaluate(feat_func, test_set, **cfg.test_kwargs)
-        print '-' * 60
-        print 'Evaluation on %s set:' % (cfg.test_split)
+        print('-' * 60)
+        print('Evaluation on %s set:' % (cfg.test_split))
         for evaluation in result.keys():
-            print '%s:' % (evaluation)
-            print "mAP: %.4f, Rank1: %.4f, Rank5: %.4f, Rank10: %.4f" % (result[evaluation]['mAP'], result[evaluation]['CMC'][0, 0],\
-                result[evaluation]['CMC'][0, 4], result[evaluation]['CMC'][0, 9])
-        print '-' * 60
+            print('%s:' % (evaluation))
+            print("mAP: %.4f, Rank1: %.4f, Rank5: %.4f, Rank10: %.4f" % (result[evaluation]['mAP'], result[evaluation]['CMC'][0, 0],\
+                result[evaluation]['CMC'][0, 4], result[evaluation]['CMC'][0, 9]))
+        print('-' * 60)
         
     # log to TensorBoard
     #if log_to_file:

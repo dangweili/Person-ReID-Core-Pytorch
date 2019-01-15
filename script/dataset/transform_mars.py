@@ -3,7 +3,7 @@
 import os
 import sys
 import numpy as np
-import cPickle as pickle
+import pickle
 import random
 from zipfile import ZipFile
 import re
@@ -19,12 +19,12 @@ def make_dir(path):
         os.mkdir(path)
 
 def unzip_mars_data(zip_file, save_dir):
-    print "Extracting mars zip files"
-    print zip_file
+    print("Extracting mars zip files")
+    print(zip_file)
     make_dir(save_dir)
     with ZipFile(zip_file) as f:
         f.extractall(save_dir)
-    print "Extracting mars zip file done!"
+    print("Extracting mars zip file done!")
 
 def parse_image_name( img_name ):
     # pid, cam, seq, frame, record
@@ -115,7 +115,7 @@ def generate_data_description(save_dir):
         dataset['track_seq_g'].append(seq)
     
     dataset['root'] = './dataset/mars'
-    with open(os.path.join(save_dir, 'mars_dataset.pkl'), 'w+') as f:
+    with open(os.path.join(save_dir, 'mars_dataset.pkl'), 'wb+') as f:
         pickle.dump(dataset, f)
 
 def create_trainvaltest_split(save_dir, split_file, val_cnt=100):
@@ -126,7 +126,7 @@ def create_trainvaltest_split(save_dir, split_file, val_cnt=100):
     for f in dirs:
         pid = int(f)
         trainval_identity[pid] = 1
-    trainval_identity = trainval_identity.keys()
+    trainval_identity = list(trainval_identity.keys())
     random.shuffle(trainval_identity)
     train_identity = trainval_identity[:-val_cnt]
     val_identity = trainval_identity[-val_cnt:]
@@ -140,13 +140,13 @@ def create_trainvaltest_split(save_dir, split_file, val_cnt=100):
         else:
             pid = int(pid_str)
         test_identity[pid] = 1
-    test_identity = test_identity.keys()
+    test_identity = list(test_identity.keys())
     partition = dict()
     partition['trainval'] = [trainval_identity]
     partition['val'] = [val_identity]
     partition['train'] = [train_identity]
     partition['test'] = [test_identity]
-    with open(split_file, 'w+') as f:
+    with open(split_file, 'wb+') as f:
         pickle.dump(partition, f)
 
 if __name__ == "__main__":

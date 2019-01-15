@@ -5,7 +5,7 @@ import h5py
 from zipfile import ZipFile
 from scipy.misc import imsave
 from itertools import chain
-import cPickle as pickle
+import pickle
 import numpy as np
 import random
 import pdb
@@ -20,12 +20,12 @@ def make_dir(path):
         os.mkdir(path)
 
 def unzip_viper_data(zip_file, save_dir):
-    print "Extracting viper zip file:\n"
-    print zip_file
+    print("Extracting viper zip file:\n")
+    print(zip_file)
     make_dir(save_dir) 
     with ZipFile(zip_file) as f:
         f.extractall(save_dir)
-    print "Extracting viper zip file done!\n"
+    print("Extracting viper zip file done!\n")
 
 def parse_image_name(img_name):
     pid = int(img_name.split('_')[0])
@@ -63,7 +63,7 @@ def generate_dataset_description(save_dir):
         dataset['seq'].append(1)
         dataset['frame'].append(1)
         dataset['record'].append(1)
-    with open(os.path.join(save_dir, 'viper_dataset.pkl'), 'w+') as f:
+    with open(os.path.join(save_dir, 'viper_dataset.pkl'), 'wb+') as f:
         pickle.dump(dataset, f)
 
 def create_trainvaltest_split(save_dir, split_file, val_cnt=100):
@@ -87,7 +87,7 @@ def create_trainvaltest_split(save_dir, split_file, val_cnt=100):
         partition['train'].append(tmp[:316-val_cnt])
         partition['val'].append(tmp[316-val_cnt:316])
         partition['test'].append(tmp[316:])
-    with open(split_file, 'w+') as f:
+    with open(split_file, 'wb+') as f:
         pickle.dump(partition, f)
     
 if __name__ == "__main__":

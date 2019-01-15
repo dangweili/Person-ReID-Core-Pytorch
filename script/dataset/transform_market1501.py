@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import random
-import cPickle as pickle
+import pickle
 import pdb
 from zipfile import ZipFile
 
@@ -14,12 +14,12 @@ def make_dir(path):
         os.mkdir(path)
 
 def unzip_market1501_data(zip_file, save_dir):
-    print "Extracting market1501 zip file"
-    print zip_file
+    print("Extracting market1501 zip file")
+    print(zip_file)
     make_dir(save_dir)
     with ZipFile(zip_file) as f:
         f.extractall(save_dir)
-    print "Extracting market1501 zip file done!"
+    print("Extracting market1501 zip file done!")
 
 def parse_image_name( img_name ):
     # pid, cam, seq, frame, record
@@ -117,7 +117,7 @@ def generate_data_description(save_dir):
         dataset['frame_q'].append(frame)
         dataset['record_q'].append(record)
     dataset['root'] = './dataset/market1501'
-    with open(os.path.join(save_dir, 'market1501_dataset.pkl'), 'w+') as f:
+    with open(os.path.join(save_dir, 'market1501_dataset.pkl'), 'wb+') as f:
         pickle.dump(dataset, f)
 
 def create_trainvaltest_split(save_dir, traintest_split_file, val_cnt=100):
@@ -130,7 +130,7 @@ def create_trainvaltest_split(save_dir, traintest_split_file, val_cnt=100):
         basename = os.path.basename(f)
         pid, cam, seq, frame, record = parse_image_name( basename )
         trainval_identity[pid] = 1
-    trainval_identity = trainval_identity.keys()
+    trainval_identity = list(trainval_identity.keys())
     random.shuffle(trainval_identity)
     train_identity = trainval_identity[:-val_cnt]
     val_identity = trainval_identity[-val_cnt:]
@@ -141,7 +141,7 @@ def create_trainvaltest_split(save_dir, traintest_split_file, val_cnt=100):
     partition['val'] = [val_identity]
     partition['train'] = [train_identity]
     partition['test'] = [test_identity]
-    with open(traintest_split_file, 'w+') as f:
+    with open(traintest_split_file, 'wb+') as f:
         pickle.dump(partition, f)
 
 if  __name__ == "__main__":

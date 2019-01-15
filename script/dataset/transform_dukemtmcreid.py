@@ -1,7 +1,7 @@
 import os
 import sys
 from zipfile import ZipFile
-import cPickle as pickle
+import pickle
 import numpy as np
 import random
 import pdb
@@ -16,12 +16,12 @@ def make_dir(path):
        os.mkdir(path)
 
 def unzip_dukemtmcreid_data(zip_file, save_dir):
-    print "Extracting dukemtmcreid zip file"
-    print zip_file
+    print("Extracting dukemtmcreid zip file")
+    print(zip_file)
     make_dir(save_dir)
     with ZipFile(zip_file) as f:
         f.extractall(save_dir)
-    print "Extracting dukemtmcreid zip file done!"
+    print("Extracting dukemtmcreid zip file done!")
 
 def parse_image_name( img_name ):
     # pid, cam, seq, frame, record
@@ -99,7 +99,7 @@ def generate_dataset_description(save_dir):
         dataset['frame_q'].append(frame)
         dataset['record_q'].append(record)
     dataset['root'] = './dataset/dukemtmcreid'
-    with open(os.path.join(save_dir, 'dukemtmcreid_dataset.pkl'), 'w+') as f:
+    with open(os.path.join(save_dir, 'dukemtmcreid_dataset.pkl'), 'wb+') as f:
         pickle.dump(dataset, f)
 
 def create_trainvaltest_split(save_dir, traintest_split_file, val_cnt=100):
@@ -112,7 +112,7 @@ def create_trainvaltest_split(save_dir, traintest_split_file, val_cnt=100):
         basename = os.path.basename(f)
         pid, cam, seq, frame, record = parse_image_name( basename )
         trainval_identity[pid] = 1
-    trainval_identity = trainval_identity.keys()
+    trainval_identity = list(trainval_identity.keys())
     random.shuffle(trainval_identity)
     train_identity = trainval_identity[:-val_cnt]
     val_identity = trainval_identity[-val_cnt:]
@@ -125,13 +125,13 @@ def create_trainvaltest_split(save_dir, traintest_split_file, val_cnt=100):
         basename = os.path.basename(f)
         pid, cam, seq, frame, record = parse_image_name( basename )
         test_identity[pid] = 1
-    test_identity = test_identity.keys()
+    test_identity = list(test_identity.keys())
     partition = dict()
     partition['trainval'] = [trainval_identity]
     partition['val'] = [val_identity]
     partition['train'] = [train_identity]
     partition['test'] = [test_identity]
-    with open(traintest_split_file, 'w+') as f:
+    with open(traintest_split_file, 'wb+') as f:
         pickle.dump(partition, f)
     pass
 

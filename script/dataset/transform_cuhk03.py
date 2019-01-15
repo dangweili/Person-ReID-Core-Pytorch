@@ -6,7 +6,7 @@ from zipfile import ZipFile
 from scipy.misc import imsave
 from scipy.io import loadmat
 from itertools import chain
-import cPickle as pickle
+import pickle
 import numpy as np
 import random
 import pdb
@@ -24,12 +24,12 @@ def make_dir(path):
         os.mkdir(path)
 
 def unzip_cuhk03_data(zip_file, save_dir):
-    print "Extracting cuhk03 zip file:\n"
-    print zip_file
+    print("Extracting cuhk03 zip file:\n")
+    print(zip_file)
     make_dir(save_dir) 
     with ZipFile(zip_file) as f:
         f.extractall(save_dir)
-    print "Extracting cuhk03 zip file done!\n"
+    print("Extracting cuhk03 zip file done!\n")
 
 def parse_image_name(img_name):
     if len(img_name) != 40:
@@ -43,7 +43,7 @@ def parse_image_name(img_name):
 
 def create_unified_data(save_dir):
     mat_file = os.path.join(save_dir, 'cuhk03_release/cuhk-03.mat')
-    print "Creating unified data: ID8_CAM4_SEQ4_FRAME8_RECORD8"
+    print("Creating unified data: ID8_CAM4_SEQ4_FRAME8_RECORD8")
     img_name_tmp = '{:08d}_{:04d}_{:04d}_{:08d}_{:08d}.png'
     def deref(mat, ref):
         return mat[ref][:].T
@@ -80,7 +80,7 @@ def create_unified_data(save_dir):
                 if fname != '':
                     global_list_det.append(os.path.join('detected', fname))
             if pid % 100 == 0:
-                print 'Saving images {}/{}'.format(pid, 1467)
+                print('Saving images {}/{}'.format(pid, 1467))
             pid = pid + 1
 def generate_dataset_description(save_dir):
     labeled_im_dir = os.path.join(save_dir, 'labeled')
@@ -139,7 +139,7 @@ def generate_dataset_description(save_dir):
         dataset['seq_g'].append(seq)
         dataset['frame_g'].append(frame)
         dataset['record_g'].append(record)
-    with open(os.path.join(save_dir, 'cuhk03_labeled_dataset.pkl'), 'w+') as f:
+    with open(os.path.join(save_dir, 'cuhk03_labeled_dataset.pkl'), 'wb+') as f:
         pickle.dump(dataset, f)
     dataset = {}
     dataset['description'] = 'cuhk03'
@@ -192,7 +192,7 @@ def generate_dataset_description(save_dir):
         dataset['seq_g'].append(seq)
         dataset['frame_g'].append(frame)
         dataset['record_g'].append(record)
-    with open(os.path.join(save_dir, 'cuhk03_detected_dataset.pkl'), 'w+') as f:
+    with open(os.path.join(save_dir, 'cuhk03_detected_dataset.pkl'), 'wb+') as f:
         pickle.dump(dataset, f)
 
 def create_trainvaltest_split_old(save_dir, split_file, val_cnt=100):
@@ -206,7 +206,7 @@ def create_trainvaltest_split_old(save_dir, split_file, val_cnt=100):
     for i in range(len(IDs)):
         startIDs.append(IDs[i] + startIDs[i])
     if startIDs[-1] != 1467:
-        print 'person identities are not consistent'
+        print('person identities are not consistent')
     # 20 times
     partition = dict()
     partition['trainval'] = []
@@ -227,7 +227,7 @@ def create_trainvaltest_split_old(save_dir, split_file, val_cnt=100):
         partition['train'].append(train_identity)
         partition['val'].append(val_identity)
         partition['test'].append(test_identity)
-    with open(split_file, 'w+') as f:
+    with open(split_file, 'wb+') as f:
         pickle.dump(partition, f)
 
 #  
@@ -239,7 +239,7 @@ def create_trainvaltest_split_new(save_dir, label, split_file, val_cnt=100):
     elif label == 'detected':
         mat_file = './dataset/cuhk03/cuhk03_new_protocol_config_detected.mat'
     else:
-        print '%s not supported'%(label)
+        print('%s not supported'%(label))
         raise ValueError
 
     mat = loadmat(open(mat_file, 'r'))
@@ -267,7 +267,7 @@ def create_trainvaltest_split_new(save_dir, label, split_file, val_cnt=100):
     partition['train'].append(train_identity)
     partition['val'].append(val_identity)
     partition['test'].append(test_identity)
-    with open(split_file, 'w+') as f:
+    with open(split_file, 'wb+') as f:
         pickle.dump(partition, f)
 
 if __name__ == "__main__":

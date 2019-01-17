@@ -1,4 +1,4 @@
-1. Install [Pytorch 0.3.1](https://pytorch.org/) and Python 2.7.
+1. Install [Pytorch 1.0](https://pytorch.org/) and Python 3.6.
 
 2. Download the datasets and put it in the ./dataset/xxx
 

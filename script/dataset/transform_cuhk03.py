@@ -114,7 +114,7 @@ def generate_dataset_description(save_dir):
     dataset['frame_q'] = []
     dataset['record_q'] = []
     mat_file = './dataset/cuhk03/cuhk03_new_protocol_config_labeled.mat'
-    mat = loadmat(open(mat_file, 'r'))
+    mat = loadmat(open(mat_file, 'rb'))
     for i in range(mat['query_idx'].shape[0]):
         idx = mat['query_idx'][i, 0]-1
         pid, cam, seq, frame, record = parse_image_name(os.path.basename(global_list_lab[idx]))
@@ -161,7 +161,7 @@ def generate_dataset_description(save_dir):
         dataset['record'].append(record)
     dataset['root'] = './dataset/cuhk03'
     mat_file = './dataset/cuhk03/cuhk03_new_protocol_config_detected.mat'
-    mat = loadmat(open(mat_file, 'r'))
+    mat = loadmat(open(mat_file, 'rb'))
     dataset['image_q'] = []
     dataset['pid_q'] = []
     dataset['cam_q'] = []
@@ -218,7 +218,7 @@ def create_trainvaltest_split_old(save_dir, split_file, val_cnt=100):
         testIDs = mat[mat['testsets'][0][i]][:].T # 100*2
         for j in range(testIDs.shape[0]):
             test_identity.append(startIDs[int(testIDs[j, 0])-1] + int(testIDs[j, 1]))
-        tmp_identitys = range(1, 1468)
+        tmp_identitys = list(range(1, 1468))
         random.shuffle(tmp_identitys)
         trainval_identity = [pid for pid in tmp_identitys if pid not in test_identity]
         train_identity = trainval_identity[:-val_cnt] 
@@ -242,7 +242,7 @@ def create_trainvaltest_split_new(save_dir, label, split_file, val_cnt=100):
         print('%s not supported'%(label))
         raise ValueError
 
-    mat = loadmat(open(mat_file, 'r'))
+    mat = loadmat(open(mat_file, 'rb'))
     partition = {}
     partition['trainval'] = []
     partition['train'] = []
@@ -257,11 +257,11 @@ def create_trainvaltest_split_new(save_dir, label, split_file, val_cnt=100):
         else:
             pid, cam, seq, frame, record = parse_image_name(os.path.basename(global_list_det[idx]))
         trainval_identity[pid] = 1
-    trainval_identity = trainval_identity.keys()
+    trainval_identity = list(trainval_identity.keys())
     random.shuffle(trainval_identity)
     train_identity = trainval_identity[:-val_cnt]
     val_identity = trainval_identity[-val_cnt:]
-    tmp_identitys = range(1, 1468)
+    tmp_identitys = list(range(1, 1468))
     test_identity = [pid for pid in tmp_identitys if pid not in trainval_identity]
     partition['trainval'].append(trainval_identity)
     partition['train'].append(train_identity)

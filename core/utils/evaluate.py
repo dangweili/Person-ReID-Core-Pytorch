@@ -22,7 +22,7 @@ def reid_evaluate(feat_func, dataset, **kwargs):
         result['ss']['mAP']
         result['ss']['CMC'], CMC is a 1*G array
     """
-    if kwargs.has_key('eval_video') and kwargs['eval_video']:
+    if 'eval_video' in kwargs and kwargs['eval_video']:
         return reid_evaluate_sequence(feat_func, dataset, **kwargs)
     else:
         return reid_evaluate_image(feat_func, dataset, **kwargs)
@@ -38,15 +38,16 @@ def extract_feat(feat_func, dataset, **kwargs):
     N = len(dataset.image)
     start = 0
     for ep, imgs in enumerate(test_loader):
-        imgs_var = Variable(imgs, volatile=True).cuda()
-        feat_tmp = feat_func( imgs_var )
+        with torch.no_grad():
+            imgs_var = Variable(imgs).cuda()
+            feat_tmp = feat_func( imgs_var )
         batch_size = feat_tmp.shape[0]
         if ep == 0:
-            feat = np.zeros((N, feat_tmp.size/batch_size))
+            feat = np.zeros((N, int(feat_tmp.size/batch_size)))
         feat[start:start+batch_size, :] = feat_tmp.reshape((batch_size, -1))
         start += batch_size
     
-    if kwargs.has_key('feat_only') and kwargs['feat_only']:
+    if 'feat_only' in kwargs and kwargs['feat_only']:
         return feat
     
     pid = copy.deepcopy( dataset.pid )
@@ -133,7 +134,7 @@ def feature_pooling(feat, **kwargs):
     local feature pooling and normalization
     """
     assert type(feat) == np.ndarray
-    if kwargs.has_key('feat_pool_type'):
+    if 'feat_pool_type' in kwargs:
         operation = kwargs['feat_pool_type']
     else:
         operation = 'average'
@@ -225,15 +226,15 @@ def evaluate_image_ss(dist_mat, pid, cam, **kwargs):
         result['ss']['CMC']
         result['ss']['mAP']
     """
-    if kwargs.has_key('repeat_times'):
+    if 'repeat_times' in kwargs:
         T = kwargs['repeat_times']
     else:
         T = 1
     data = dict()
     for i, (p, c) in enumerate(zip(pid[0, :], cam[0, :])):
-        if not data.has_key(p):
+        if p not in data:
             data[p] = dict()
-        if not data[p].has_key(c):
+        if c not in data[p]:
             data[p][c] = []
         data[p][c].append(i)
     # random T times for testing
@@ -272,14 +273,14 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
     result = dict()
     data = dict()
     for i, (p, c) in enumerate(zip(pid, cam)):
-        if not data.has_key(p):
+        if p not in data:
             data[p] = dict()
-        if not data[p].has_key(c):
+        if c not in data[p]:
             data[p][c] = []
         data[p][c].append(i)
     # default: single query
-    sq_flag = kwargs.has_key('eval_type') and 'sq' in kwargs['eval_type']
-    sq_flag = sq_flag or not kwargs.has_key('eval_type')
+    sq_flag = 'eval_type' in kwargs and 'sq' in kwargs['eval_type']
+    sq_flag = sq_flag or 'eval_type'not in kwargs
     if sq_flag:
         # for each person at each camera, sample one image
         query_idx = []
@@ -293,7 +294,7 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
         query_cam = gallery_cam[:, query_idx]
         query_feat = feat[query_idx, :]
         print('compute distance for single query.')
-        if kwargs.has_key('dist_type'):
+        if 'dist_type' in kwargs:
             dist_mat = compute_dist(query_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
             dist_mat = compute_dist(query_feat, gallery_feat, dist_type='euclidean_normL2', verbose=True)
@@ -302,7 +303,7 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
         result['sq']['mAP'] = mAP
         result['sq']['CMC'] = CMC
     # mutiple query 
-    if kwargs.has_key('eval_type') and 'mq' in kwargs['eval_type']:
+    if 'eval_type' in kwargs and 'mq' in kwargs['eval_type']:
         # re-organize the query feature
         query_pid = []
         query_cam = []
@@ -324,7 +325,7 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
         gallery_cam = np.array(cam).reshape((1, len(cam)))
         gallery_feat = feat
         print('compute distance for mutiple query.')
-        if kwargs.has_key('dist_type'):
+        if 'dist_type' in kwargs:
             dist_mat = compute_dist(query_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
             dist_mat = compute_dist(query_feat, gallery_feat, dist_type='euclidean_normL2', verbose=True)
@@ -335,9 +336,9 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
         result['mq']['CMC'] = CMC
             
     # single shot, specially for cuhk03 val/test in old style
-    if kwargs.has_key('eval_type') and 'ss' in kwargs['eval_type']:
+    if 'eval_type' in kwargs and 'ss' in kwargs['eval_type']:
         print('compute distance for single shot.')
-        if kwargs.has_key('dist_type'):
+        if 'dist_type' in kwargs:
             dist_mat = compute_dist(feat, feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
             dist_mat = compute_dist(feat, feat, dist_type='euclidean_normL2', verbose=True)
@@ -349,7 +350,7 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
         result['ss']['CMC'] = CMC
     
     # mutiple shot specially for cuhk03 val/test in old style
-    if kwargs.has_key('eval_type') and 'ms' in kwargs['eval_type']:
+    if 'eval_type' in kwargs and 'ms' in kwargs['eval_type']:
         query_pid = []
         query_cam = []
         query_idx = []
@@ -367,7 +368,7 @@ def reid_evaluate_image_sequence_pids(feat, pid, cam, **kwargs):
         query_pid = np.array(query_pid).reshape((1, Q))
         query_cam = np.array(query_cam).reshape((1, Q))
         print('compute distance for mutiple shot.')
-        if kwargs.has_key('dist_type'):
+        if 'dist_type' in kwargs:
             dist_mat = compute_dist(query_feat, query_feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
             dist_mat = compute_dist(query_feat, query_feat, dist_type='euclidean_normL2', verbose=True)
@@ -386,7 +387,7 @@ def reid_evaluate_image_cuhk03_old(feat_func, dataset, **kwargs):
     return reid_evaluate_image_pids(feat_func, dataset, **kwargs)
 
 def reid_evaluate_image_cuhk03(feat_func, dataset, **kwargs):
-    if kwargs.has_key('cuhk03_new') and kwargs['cuhk03_new']:
+    if 'cuhk03_new' in kwargs and kwargs['cuhk03_new']:
         return reid_evaluate_image_cuhk03_new(feat_func, dataset, **kwargs)
     else:
         return reid_evaluate_image_cuhk03_old(feat_func, dataset, **kwargs)
@@ -407,8 +408,8 @@ def reid_evaluate_image_fixed_query_gallery(feat_func, dataset, **kwargs):
         extract_feat(feat_func, dataset)
     
     # mutiple query
-    if kwargs.has_key('eval_type') and 'mq' in kwargs['eval_type']:
-        if dataset.dataset.has_key('image_gt'):
+    if 'eval_type' in kwargs and 'mq' in kwargs['eval_type']:
+        if 'image_gt' in dataset.dataset:
             print('Extracting features for fixed groundtruth in mutiple query.')
             dataset.create_image_list_by_fixed_groundtruth()
             gt_feat, gt_pid, gt_cam, gt_seq, gt_frame, gt_record = \
@@ -446,7 +447,7 @@ def reid_evaluate_image_sequence_fixed_query_gallery_groundtruth(query_feat, que
     gallery_cam = np.array(gallery_cam).reshape((1, G))
 
     print('compute distance for single query.')
-    if kwargs.has_key('dist_type'):
+    if 'dist_type' in kwargs:
         dist_mat = compute_dist(query_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
     else:
         dist_mat = compute_dist(query_feat, gallery_feat, dist_type='euclidean_normL2', verbose=True)
@@ -457,25 +458,25 @@ def reid_evaluate_image_sequence_fixed_query_gallery_groundtruth(query_feat, que
     result['sq']['mAP'] = mAP
     result['sq']['CMC'] = CMC
 
-    if kwargs.has_key('rerank_k1'):
+    if 'rerank_k1' in kwargs:
         k1 = kwargs['rerank_k1']
     else:
         k1 = 20
 
-    if kwargs.has_key('rerank_k2'):
+    if 'rerank_k2' in kwargs:
         k2 = kwargs['rerank_k2']
     else:
         k2 = 6
        
-    if kwargs.has_key('rerank_lambda'):
+    if 'rerank_lambda' in kwargs:
         lambda_value = kwargs['rerank_lambda']
     else:
         lambda_value = 0.3
 
-    if kwargs.has_key('rerank') and kwargs['rerank']:
+    if 'rerank' in kwargs and kwargs['rerank']:
         q_g_dist = dist_mat
         print('compute distance for single query rerank.')
-        if kwargs.has_key('dist_type'):
+        if 'dist_type' in kwargs:
             q_q_dist = compute_dist(query_feat, query_feat, dist_type=kwargs['dist_type'], verbose=True)
             g_g_dist = compute_dist(gallery_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
@@ -501,7 +502,7 @@ def reid_evaluate_image_sequence_fixed_query_gallery_groundtruth(query_feat, que
         mquery_feat[i, :] = feature_pooling(gt_feat[idx[0, :], :], **kwargs)
     
     print('compute distance for mutiple query.')
-    if kwargs.has_key('dist_type'):
+    if 'dist_type' in kwargs:
         dist_mat = compute_dist(mquery_feat, gallery_feat, dist_type=kwargs['dist_type'], verbose=True)
     else:
         dist_mat = compute_dist(mquery_feat, gallery_feat, dist_type='euclidean_normL2', verbose=True)
@@ -512,10 +513,10 @@ def reid_evaluate_image_sequence_fixed_query_gallery_groundtruth(query_feat, que
     result['mq']['CMC'] = CMC
 
     # rerank sq
-    if kwargs.has_key('rerank') and kwargs['rerank']:
+    if 'rerank' in kwargs and kwargs['rerank']:
         mq_g_dist = dist_mat
         print('compute distance for mutiple query rerank.')
-        if kwargs.has_key('dist_type'):
+        if 'dist_type' in kwargs:
             mq_mq_dist = compute_dist(mquery_feat, mquery_feat, dist_type=kwargs['dist_type'], verbose=True)
         else:
             mq_mq_dist = compute_dist(mquery_feat, mquery_feat, dist_type='euclidean_normL2', verbose=True)
@@ -553,11 +554,11 @@ def reid_evaluate_sequence_pids(feat_func, dataset, **kwargs):
     data = dict()
     N_seq = 0 
     for i, (p, c, s) in enumerate(zip(pid, cam, seq)):
-        if not data.has_key(p):
+        if p not in data:
             data[p] = dict()
-        if not data[p].has_key(c):
+        if c not in data[p]:
             data[p][c] = dict()
-        if not data[p][c].has_key(s):
+        if s not in data[p][c]:
             data[p][c][s] = []
             N_seq = N_seq + 1 
         data[p][c][s].append(i)
@@ -597,11 +598,11 @@ def reid_evaluate_sequence_mars(feat_func, dataset, **kwargs):
     data = dict()
     N_seq = 0 
     for i, (p, c, s) in enumerate(zip(pid, cam, seq)):
-        if not data.has_key(p):
+        if p not in data:
             data[p] = dict()
-        if not data[p].has_key(c):
+        if c not in data[p]:
             data[p][c] = dict()
-        if not data[p][c].has_key(s):
+        if s not in data[p][c]:
             data[p][c][s] = []
             N_seq = N_seq + 1 
         data[p][c][s].append(i)

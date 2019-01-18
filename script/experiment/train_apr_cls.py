@@ -3,6 +3,8 @@ import os
 import numpy as np
 import random
 
+sys.path.append(os.getcwd())
+
 import torch
 import torch.optim as optim
 import torchvision.transforms as transforms
@@ -117,7 +119,7 @@ class Config(object):
             partitions['cuhk03_detected'] = './dataset/cuhk03/cuhk03_partition_old.pkl'
             partitions['cuhk03_labeled'] = './dataset/cuhk03/cuhk03_partition_old.pkl'
         self.dataset_name = args.dataset
-        if not datasets.has_key(args.dataset) or not partitions.has_key(args.dataset):
+        if args.dataset not in datasets or args.dataset not in partitions:
             print("Please select the right dataset name.")
             raise ValueError
         else:

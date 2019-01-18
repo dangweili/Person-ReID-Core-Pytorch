@@ -20,14 +20,14 @@ class ReIDDataset(data.Dataset):
         target_transform=None,
         **kwargs):
         if os.path.exists( dataset ):
-            self.dataset = pickle.load(open(dataset))
+            self.dataset = pickle.load(open(dataset, 'rb'))
         else:
             raise ValueError
         if os.path.exists( partition ):
-            self.partition = pickle.load(open(partition))
+            self.partition = pickle.load(open(partition, 'rb'))
         else:
             raise ValueError
-        if not self.partition.has_key(split):
+        if split not in self.partition:
             print(split + 'does not exist in dataset.')
             raise ValueError
         
@@ -53,7 +53,7 @@ class ReIDDataset(data.Dataset):
         self.label = []
         self.camera = []
         for idx, pid in enumerate(self.dataset['pid']):
-            if self.id2label.has_key( pid ):
+            if pid in self.id2label:
                 self.image.append( self.dataset['image'][idx] )
                 self.label.append( self.id2label[pid] )
                 self.camera.append( self.dataset['cam'][idx] )
@@ -95,14 +95,14 @@ class ReIDTestDataset(data.Dataset):
         target_transform=None,
         **kwargs):
         if os.path.exists( dataset ):
-            self.dataset = pickle.load(open(dataset))
+            self.dataset = pickle.load(open(dataset, 'rb'))
         else:
             raise ValueError
         if os.path.exists( partition ):
-            self.partition = pickle.load(open(partition))
+            self.partition = pickle.load(open(partition, 'rb'))
         else:
             raise ValueError
-        if not self.partition.has_key(split):
+        if split not in self.partition:
             print(split + 'does not exist in dataset.')
             raise ValueError
         
